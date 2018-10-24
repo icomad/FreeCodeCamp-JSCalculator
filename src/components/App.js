@@ -10,8 +10,8 @@ class App extends Component {
     super(props);
 
     this.state = {
-      mForce: 15,
-      rForce: 15,
+      mForce: 10,
+      rForce: 10,
       parallax: {
         top: 'inherit',
         left: 'inherit',
@@ -205,7 +205,7 @@ class App extends Component {
 
     prevValue = history.slice(-3)[0];
     displayVal = currentValue;
-    this.setState({ history, currentValue, displayVal, prevValue });
+    this.setState({ history, currentValue, displayVal, prevValue, currentOp });
 
   }
 
