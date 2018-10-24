@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "node-sass": "^4.9.4",
     "react": "^16.5.2",
+    "react-device-detect": "^1.6.1",
     "react-dom": "^16.5.2",
+    "react-parallax-button": "^1.0.4",
     "react-scripts": "2.0.5"
   },
   "scripts": {
