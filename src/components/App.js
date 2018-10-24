@@ -23,6 +23,7 @@ class App extends Component {
       currentOp: '',
       history: [],
       isDecimal: false,
+      disable: false,
     }
   }
 
@@ -96,6 +97,9 @@ class App extends Component {
       case 'n':
         this.handleOperator('+/-');
         break;
+      case '.':
+        this.handleOperator('.');
+        break;
       default:
         break;
     }
@@ -123,6 +127,7 @@ class App extends Component {
       history: [],
       displayVal: '0',
       isDecimal: false,
+      disable: false,
     })
   }
 
@@ -137,7 +142,7 @@ class App extends Component {
 
   handleOperator = (op) => {
     let history = [...this.state.history];
-    let { currentValue, prevValue, currentOp, displayVal, isDecimal } = this.state
+    let { currentValue, currentOp, displayVal, isDecimal, disable } = this.state
     switch (op) {
       case '+':
       case '-':
@@ -147,8 +152,9 @@ class App extends Component {
         history.push(op);
         displayVal = op;
         currentOp = op;
-        isDecimal = false
-        this.setState({ history, currentOp, displayVal, isDecimal });
+        isDecimal = false;
+        disable = false;
+        this.setState({ history, currentOp, displayVal, isDecimal, disable });
         break;
       case 'AC':
         this.initialize();
@@ -158,11 +164,12 @@ class App extends Component {
         history.pop();
         displayVal = history[history.length - 1];
         isDecimal = false;
-        this.setState({ history, displayVal, isDecimal });
+        disable = false;
+        this.setState({ history, displayVal, isDecimal, disable });
         break;
       case '+/-':
         if (this.isOperator(displayVal)) break;
-        currentValue = '-' + currentValue;
+        currentValue = currentValue.slice(0, 1) === '-' ? currentValue.slice(1) : '-' + currentValue;
         history[history.length - 1] = currentValue;
         displayVal = currentValue;
         this.setState({ history, currentValue, displayVal });
@@ -175,23 +182,26 @@ class App extends Component {
         currentValue = result;
         history = [result];
         isDecimal = false;
-        this.setState({ history, displayVal, currentOp, currentValue, isDecimal });
+        disable = false;
+        this.setState({ history, displayVal, currentOp, currentValue, isDecimal, disable });
         break;
       case '.':
-        if (this.isOperator(displayVal) || isDecimal) break;
+        if (this.isOperator(displayVal) || isDecimal || disable) break;
         isDecimal = true;
         currentValue = currentValue + '.';
         displayVal = currentValue;
         history[history.length - 1] = currentValue;
         this.setState({ history, currentValue, displayVal, isDecimal })
+        break;
       default:
         break;
     }
   }
 
-  handleNumber = async (value) => {
+  handleNumber = (value) => {
     let history = [...this.state.history];
-    let { currentValue, prevValue, currentOp, displayVal, isDecimal } = this.state
+    let { currentValue, prevValue, currentOp, displayVal, disable } = this.state
+    if (disable) { this.setState({ displayVal: 'MAX DIGIT REACHED', disable: true }, () => { setTimeout(() => { this.setState({ displayVal: currentValue }) }, 600) }); return; }
     if (displayVal === '0' && value === '0') return;
     if (currentOp === '=') {
       currentValue = '';
@@ -199,6 +209,7 @@ class App extends Component {
       currentOp = '';
       history = [];
     }
+    if (displayVal.length > 18) { this.setState({ displayVal: 'MAX DIGIT REACHED', disable: true }, () => { setTimeout(() => { this.setState({ displayVal: currentValue }) }, 600) }); return; }
     if (!this.isOperator(displayVal) && (displayVal !== '0')) { currentValue += value; history.pop(); history.push(currentValue); }
     else if (displayVal === '0') { currentValue = value; history.pop(); history.push(currentValue) }
     else { currentValue = value; history.push(currentValue); };
