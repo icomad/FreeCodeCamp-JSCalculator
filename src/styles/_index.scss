@@ -24,8 +24,20 @@ body{
   color: $base-white;
 }
 
+header{
+  height: 5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+  h1{
+  text-shadow: 0px 0px 10px rgba(0,0,0,.7);
+  transform: translateZ(25px);
+  }
+}
+
 .calc-grid{
-  height: 100vh;
+  height: 95vh;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-areas: 
@@ -40,6 +52,7 @@ body{
   ". . . .";
   justify-items: center;
   align-items: center;
+  grid-row-gap: 20px;
 }
 
 #display{
@@ -193,7 +206,7 @@ body{
 
 @media screen and (min-width: 768px){
   .calc-grid{
-    height: 100vh;
+    height: 95vh;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr ;
     grid-template-areas: 

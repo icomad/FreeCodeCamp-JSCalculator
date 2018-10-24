@@ -17,19 +17,12 @@ class App extends Component {
         left: 'inherit',
         transform: 'none',
       },
-      initialState: {
-        valToDisplay: '0',
-        currentValue: '0',
-        currentOp: '',
-        currentResult: '0',
-        history: [],
-      },
-      valToDisplay: '0',
-      currentValue: 0,
+      displayVal: '0',
+      prevValue: '',
+      currentValue: '',
       currentOp: '',
-      currentResult: 0,
-      isDecimal: false,
       history: [],
+      isDecimal: false,
     }
   }
 
@@ -50,34 +43,34 @@ class App extends Component {
   handleKeyboard = (e) => {
     switch (e.key) {
       case '0':
-        this.handleNumber(0);
+        this.handleNumber('0');
         break;
       case '1':
-        this.handleNumber(1);
+        this.handleNumber('1');
         break;
       case '2':
-        this.handleNumber(2);
+        this.handleNumber('2');
         break;
       case '3':
-        this.handleNumber(3);
+        this.handleNumber('3');
         break;
       case '4':
-        this.handleNumber(4);
+        this.handleNumber('4');
         break;
       case '5':
-        this.handleNumber(5);
+        this.handleNumber('5');
         break;
       case '6':
-        this.handleNumber(6);
+        this.handleNumber('6');
         break;
       case '7':
-        this.handleNumber(7);
+        this.handleNumber('7');
         break;
       case '8':
-        this.handleNumber(8);
+        this.handleNumber('8');
         break;
       case '9':
-        this.handleNumber(9);
+        this.handleNumber('9');
         break;
       case 'a':
         this.handleOperator('+');
@@ -122,153 +115,128 @@ class App extends Component {
     this.setState({ parallax: { top, left, transform } });
   }
 
-  calcResult = (op, currentResult, currentValue) => {
-    let total = 0;
-    switch (op) {
-      case '+':
-        total = currentResult + currentValue;
-        break;
-      case '-':
-        total = currentResult - currentValue;
-        break;
-      case '/':
-        total = currentResult / currentValue;
-        break;
-      case 'x':
-        total = currentResult * currentValue;
-        break;
-      default:
-        total = currentValue;
-        break;
-    }
-    return total;
+  initialize = () => {
+    this.setState({
+      currentValue: '',
+      prevValue: '',
+      currentOp: '',
+      history: [],
+      displayVal: '0',
+      isDecimal: false,
+    })
   }
 
-  revertOp = (op, currentResult, currentValue) => {
-    switch (op) {
-      case '+':
-        return currentResult - currentValue;
-      case '-':
-        return currentResult + currentValue;
-      case '/':
-        return currentResult * currentValue;
-      case 'x':
-        return currentResult / currentValue;
-      default:
-        break;
-    }
+  isOperator = (displayVal) => {
+    return displayVal === '+' || displayVal === '-' || displayVal === '/' || displayVal === 'x';
+  }
+
+  calcResult = (history) => {
+    const totalString = history.join(' ');
+    return eval(totalString.replace('x', '*'));
   }
 
   handleOperator = (op) => {
-    let { valToDisplay, currentValue, currentResult, currentOp, isDecimal } = this.state;
-    if ((op !== '+/-' && op !== '.')) {
-      isDecimal = false;
-      currentResult = this.calcResult(currentOp, currentResult, currentValue);
-      if (typeof valToDisplay === 'string') {
-        currentResult = this.revertOp(currentOp, currentResult, currentValue);
-      }
-      this.setState({ currentResult, isDecimal });
-    }
     let history = [...this.state.history];
+    let { currentValue, prevValue, currentOp, displayVal, isDecimal } = this.state
     switch (op) {
-      case 'AC':
-        history = [];
-        valToDisplay = '0';
-        currentOp = '';
-        currentValue = 0;
-        currentResult = 0;
-        this.setState({ history, valToDisplay, currentValue, currentOp, currentResult });
-        break;
-      case 'CE':
-        if (typeof valToDisplay === 'string' || currentOp === '') break;
-        valToDisplay = currentOp;
-        history.pop();
-        currentResult = this.revertOp(currentOp, currentResult, currentValue);
-        currentValue = history[history.length - 2];
-        this.setState({ history, valToDisplay, currentValue, currentResult });
-        break;
       case '+':
       case '-':
-      case 'x':
       case '/':
-        history[typeof valToDisplay === 'string' && history.length ? history.length - 1 : history.length] = op;
+      case 'x':
+        if (this.isOperator(displayVal)) history.pop();
+        history.push(op);
+        displayVal = op;
         currentOp = op;
-        valToDisplay = op;
-        this.setState({ history, currentOp, valToDisplay });
+        isDecimal = false
+        this.setState({ history, currentOp, displayVal, isDecimal });
+        break;
+      case 'AC':
+        this.initialize();
+        break;
+      case 'CE':
+        if (this.isOperator(displayVal) || history.length < 2) break;
+        history.pop();
+        displayVal = history[history.length - 1];
+        isDecimal = false;
+        this.setState({ history, displayVal, isDecimal });
         break;
       case '+/-':
-        if (currentValue === 0) break;
-        currentValue = -currentValue;
-        valToDisplay = currentValue;
+        if (this.isOperator(displayVal)) break;
+        currentValue = '-' + currentValue;
         history[history.length - 1] = currentValue;
-        this.setState({ history, currentValue, valToDisplay });
-        break;
-      case '.':
-        isDecimal = true;
-        currentValue = parseFloat(Math.floor(currentValue * 10000) / 10000);
-        valToDisplay = currentValue + '.';
-        this.setState({ isDecimal, currentValue, valToDisplay });
+        displayVal = currentValue;
+        this.setState({ history, currentValue, displayVal });
         break;
       case '=':
-        currentValue = Math.floor(currentResult * 100000000) / 100000000;
-        valToDisplay = Math.floor(currentResult * 10000) / 10000;
-        history = [Math.floor(currentResult * 10000) / 10000];
-        currentOp = '=';
-        this.setState({ history, currentOp, currentResult, currentValue, valToDisplay });
+        if (this.isOperator(displayVal)) history.pop();
+        const result = this.calcResult(history);
+        currentOp = op;
+        displayVal = result;
+        currentValue = result;
+        history = [result];
+        isDecimal = false;
+        this.setState({ history, displayVal, currentOp, currentValue, isDecimal });
         break;
+      case '.':
+        if (this.isOperator(displayVal) || isDecimal) break;
+        isDecimal = true;
+        currentValue = currentValue + '.';
+        displayVal = currentValue;
+        history[history.length - 1] = currentValue;
+        this.setState({ history, currentValue, displayVal, isDecimal })
       default:
         break;
     }
-
   }
 
-  handleNumber = (value) => {
-    let { currentResult, currentValue, valToDisplay, isDecimal, currentOp } = this.state;
+  handleNumber = async (value) => {
     let history = [...this.state.history];
+    let { currentValue, prevValue, currentOp, displayVal, isDecimal } = this.state
+    if (displayVal === '0' && value === '0') return;
     if (currentOp === '=') {
-      currentResult = 0;
-      currentValue = 0;
+      currentValue = '';
+      prevValue = '';
+      currentOp = '';
       history = [];
-      valToDisplay = '0';
     }
-    if (isDecimal) {
-      const index = typeof valToDisplay === 'string' ? valToDisplay.indexOf('.') : valToDisplay.toString().indexOf('.');
-      const decimPlaces = valToDisplay.toString().length - index;
-      currentValue = currentValue + value / Math.pow(10, decimPlaces);
-      currentValue = Math.floor(currentValue * 100000000) / 100000000;
-    } else {
-      currentValue = typeof valToDisplay === 'number' ? (currentValue >= 0 ? currentValue * 10 + value : currentValue * 10 - value) : value;
-    }
-    history[typeof valToDisplay === 'number' || isDecimal ? history.length - 1 : history.length] = currentValue;
-    valToDisplay = currentValue;
-    this.setState({ history, currentValue, valToDisplay, currentResult });
+    if (!this.isOperator(displayVal) && (displayVal !== '0')) { currentValue += value; history.pop(); history.push(currentValue); }
+    else if (displayVal === '0') { currentValue = value; history.pop(); history.push(currentValue) }
+    else { currentValue = value; history.push(currentValue); };
+
+    prevValue = history.slice(-3)[0];
+    displayVal = currentValue;
+    this.setState({ history, currentValue, displayVal, prevValue });
+
   }
 
   render() {
-    const { parallax, history, valToDisplay } = this.state;
+    const { parallax, history, displayVal } = this.state;
     return (
-      <div className='calc-grid'>
-        <Display valToDisplay={valToDisplay} history={history} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'undo'} opSign={'CE'} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'equals'} opSign={'='} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'add'} opSign={'+'} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'subtract'} opSign={'-'} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'multiply'} opSign={'x'} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'divide'} opSign={'/'} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'decimal'} opSign={'.'} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'negative'} opSign={'+/-'} style={parallax} />
-        <OperationButton onClick={this.handleOperator} operation={'clear'} opSign={'AC'} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'zero'} value={0} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'one'} value={1} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'two'} value={2} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'three'} value={3} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'four'} value={4} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'five'} value={5} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'six'} value={6} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'seven'} value={7} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'eight'} value={8} style={parallax} />
-        <NumberButton onClick={this.handleNumber} id={'nine'} value={9} style={parallax} />
-      </div>
+      <>
+        <header style={parallax}><h1>JS Calculator</h1></header>
+        <div className='calc-grid'>
+          <Display displayVal={displayVal} history={history} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'undo'} opSign={'CE'} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'equals'} opSign={'='} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'add'} opSign={'+'} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'subtract'} opSign={'-'} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'multiply'} opSign={'x'} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'divide'} opSign={'/'} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'decimal'} opSign={'.'} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'negative'} opSign={'+/-'} style={parallax} />
+          <OperationButton onClick={this.handleOperator} operation={'clear'} opSign={'AC'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'zero'} value={'0'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'one'} value={'1'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'two'} value={'2'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'three'} value={'3'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'four'} value={'4'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'five'} value={'5'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'six'} value={'6'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'seven'} value={'7'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'eight'} value={'8'} style={parallax} />
+          <NumberButton onClick={this.handleNumber} id={'nine'} value={'9'} style={parallax} />
+        </div>
+      </>
     )
   }
 }
