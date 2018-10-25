@@ -54,6 +54,7 @@ header{
   grid-row-gap: 20px;
 }
 
+
 #display{
   grid-area: display;
   width: 75%;
@@ -202,6 +203,48 @@ header{
   transform: translateZ(25px);
 }
 
+.hover-style{
+  animation-name: hover-grey;
+  animation-duration: .4s;
+  animation-timing-function: ease;
+}
+#clear.hover-style, 
+#undo.hover-style{
+  animation-name: hover-red;
+  animation-duration: .4s;
+  animation-timing-function: ease;
+}
+#equals.hover-style{
+  animation-name: hover-green;
+  animation-duration: .4s;
+  animation-timing-function: ease;
+}
+#add.hover-style,
+#subtract.hover-style,
+#divide.hover-style,
+#multiply.hover-style,
+#negative.hover-style,{
+  animation-name: hover-blue;
+  animation-duration: .4s;
+  animation-timing-function: ease;
+}
+
+@keyframes hover-red {
+  50% {color: $base-black; background: lighten($base-red, 20%);}
+  100% {color: $base-white; background: $base-red;}
+}
+@keyframes hover-grey {
+  50% {background: darken($base-white, 30%);color: $base-white;}
+  100% {color: $base-black; background: $base-white;}
+}
+@keyframes hover-green {
+  50% {color: $base-black;background: lighten($base-green, 20%);}
+  100% {background: $base-green; color: $base-white;}
+}
+@keyframes hover-blue {
+  50% {color: $base-black; background: lighten($base-blue, 30%);}
+  100% {background: lighten($base-blue, 10%); color: $base-white;}
+}
 
 @media screen and (min-width: 768px){
   .calc-grid{

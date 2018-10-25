@@ -103,6 +103,9 @@ class App extends Component {
       default:
         break;
     }
+    this.setState({ keyPressed: e.key }, () => {
+      setTimeout(_ => this.setState({ keyPressed: '' }), 400);
+    });
   }
 
   handleMouse = (e) => {
@@ -187,6 +190,7 @@ class App extends Component {
         break;
       case '.':
         if (this.isOperator(displayVal) || isDecimal || disable) break;
+        if (!history.length) currentValue = '0';
         isDecimal = true;
         currentValue = currentValue + '.';
         displayVal = currentValue;
@@ -221,31 +225,31 @@ class App extends Component {
   }
 
   render() {
-    const { parallax, history, displayVal } = this.state;
+    const { parallax, history, displayVal, keyPressed } = this.state;
     return (
       <>
         <header style={parallax}><h1>JS Calculator</h1></header>
         <div className='calc-grid'>
           <Display displayVal={displayVal} history={history} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'undo'} opSign={'CE'} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'equals'} opSign={'='} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'add'} opSign={'+'} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'subtract'} opSign={'-'} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'multiply'} opSign={'x'} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'divide'} opSign={'/'} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'decimal'} opSign={'.'} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'negative'} opSign={'+/-'} style={parallax} />
-          <OperationButton onClick={this.handleOperator} operation={'clear'} opSign={'AC'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'zero'} value={'0'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'one'} value={'1'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'two'} value={'2'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'three'} value={'3'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'four'} value={'4'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'five'} value={'5'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'six'} value={'6'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'seven'} value={'7'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'eight'} value={'8'} style={parallax} />
-          <NumberButton onClick={this.handleNumber} id={'nine'} value={'9'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'u'} operation={'undo'} opSign={'CE'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'Enter'} operation={'equals'} opSign={'='} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'a'} operation={'add'} opSign={'+'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'s'} operation={'subtract'} opSign={'-'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'m'} operation={'multiply'} opSign={'x'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'d'} operation={'divide'} opSign={'/'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'.'} operation={'decimal'} opSign={'.'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'n'} operation={'negative'} opSign={'+/-'} style={parallax} />
+          <OperationButton keyPressed={keyPressed} onClick={this.handleOperator} keyCode={'c'} operation={'clear'} opSign={'AC'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'zero'} value={'0'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'one'} value={'1'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'two'} value={'2'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'three'} value={'3'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'four'} value={'4'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'five'} value={'5'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'six'} value={'6'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'seven'} value={'7'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'eight'} value={'8'} style={parallax} />
+          <NumberButton keyPressed={keyPressed} onClick={this.handleNumber} id={'nine'} value={'9'} style={parallax} />
         </div>
       </>
     )
