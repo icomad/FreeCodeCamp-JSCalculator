@@ -57,6 +57,7 @@ header{
 
 #display{
   grid-area: display;
+  justify-self: center;
   width: 75%;
   text-align: right;
   &:hover{
@@ -143,8 +144,7 @@ header{
 }
 #zero{
   grid-area: zero;
-  width: 70%;
-  text-align: center;
+  width: 90%;
 }
 #one{
   grid-area: one;
@@ -175,6 +175,7 @@ header{
 }
 
 .parallax {
+  width: 80%;
   position: relative;
   padding: 20px;
   box-sizing: border-box;
@@ -183,6 +184,7 @@ header{
   transform-style: preserve-3d;
   background: $base-white;
   transition: background .3s ease, color .3s ease;
+  text-align: center;
   &:hover{
     background: darken($base-white, 30%);
     color: $base-white;
@@ -248,7 +250,7 @@ header{
 
 @media screen and (min-width: 768px){
   .calc-grid{
-    height: 95vh;
+    height: auto;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr ;
     grid-template-areas: 
@@ -263,7 +265,8 @@ header{
     ". . . . . .";
     justify-items: center;
     align-items: center;
-    grid-gap: 25px;
+    grid-gap: 15px;
+    margin-top: 5%;
   }
 }
 
